@@ -1,0 +1,10 @@
+*.o
+*.su
+Debug/Core
+Debug/Drivers
+Debug/FATFS
+Debug/lvgl
+Debug/Middlewares/*
+Debug/Sinteck
+Debug/startup
+Debug/USB_DEVICE/*
