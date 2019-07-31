@@ -13,13 +13,15 @@
 #define LV_DRV_CONF_H
 
 #include "lv_conf.h"
+#include "main.h"
+#include "misc.h"
 
 /*********************
  * DELAY INTERFACE
  *********************/
 #define LV_DRV_DELAY_INCLUDE  <stdint.h>            /*Dummy include by default*/
-#define LV_DRV_DELAY_US(us)  /*delay_us(us)*/       /*Delay the given number of microseconds*/
-#define LV_DRV_DELAY_MS(ms)  /*delay_ms(ms)*/       /*Delay the given number of milliseconds*/
+#define LV_DRV_DELAY_US(us)  HAL_Delay(1)       	/*Delay the given number of microseconds*/
+#define LV_DRV_DELAY_MS(ms)  HAL_Delay(ms)       	/*Delay the given number of milliseconds*/
 
 /*********************
  * DISPLAY INTERFACE
@@ -30,7 +32,7 @@
  *------------*/
 #define LV_DRV_DISP_INCLUDE         <stdint.h>           /*Dummy include by default*/
 #define LV_DRV_DISP_CMD_DATA(val)  /*pin_x_set(val)*/    /*Set the command/data pin to 'val'*/
-#define LV_DRV_DISP_RST(val)       /*pin_x_set(val)*/    /*Set the reset pin to 'val'*/
+#define LV_DRV_DISP_RST(val)       HAL_GPIO_WritePin(TFT_RST_GPIO_Port, TFT_RST_Pin, val);    /*Set the reset pin to 'val'*/
 
 /*---------
  *  SPI
@@ -62,8 +64,8 @@
 /*---------
  *  SPI
  *---------*/
-#define LV_DRV_INDEV_SPI_CS(val)            /*spi_cs_set(val)*/     /*Set the SPI's Chip select to 'val'*/
-#define LV_DRV_INDEV_SPI_XCHG_BYTE(data)    0 /*spi_xchg(val)*/     /*Write 'val' to SPI and give the read value*/
+#define LV_DRV_INDEV_SPI_CS(val)            HAL_GPIO_WritePin(GPIOC, T_CS_Pin, val);    /*Set the SPI's Chip select to 'val'*/
+#define LV_DRV_INDEV_SPI_XCHG_BYTE(data)    xpt2046(data)								/*Write 'val' to SPI and give the read value*/
 
 /*---------
  *  I2C
@@ -130,14 +132,14 @@
 #if USE_SSD1963
 #  define SSD1963_HOR_RES     LV_HOR_RES
 #  define SSD1963_VER_RES     LV_VER_RES
-#  define SSD1963_HT          531
-#  define SSD1963_HPS         43
-#  define SSD1963_LPS         8
-#  define SSD1963_HPW         10
-#  define SSD1963_VT          288
-#  define SSD1963_VPS         12
-#  define SSD1963_FPS         4
-#  define SSD1963_VPW         10
+#  define SSD1963_HT          1055
+#  define SSD1963_HPS         210
+#  define SSD1963_LPS         0
+#  define SSD1963_HPW         0
+#  define SSD1963_VT          524
+#  define SSD1963_VPS         34
+#  define SSD1963_FPS         0
+#  define SSD1963_VPW         0
 #  define SSD1963_HS_NEG      0   /*Negative hsync*/
 #  define SSD1963_VS_NEG      0   /*Negative vsync*/
 #  define SSD1963_ORI         0   /*0, 90, 180, 270*/

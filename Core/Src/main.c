@@ -25,11 +25,18 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lvgl/lvgl.h"
+#include "lv_drivers/display/SSD1963.h"
+#include "lv_drivers/indev/XPT2046.h"
+#include "Simulacare/src/main.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+static lv_disp_buf_t disp_buf;
+static lv_color_t buf[LV_HOR_RES_MAX * 10];		// Declare a buffer for 10 lines
+static lv_color_t buf2[LV_HOR_RES_MAX * 10];	// Declare a buffer for 10 lines
+lv_indev_drv_t indev_drv;
+lv_indev_t * indev_touchpad;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -111,6 +118,42 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
+    HAL_GPIO_TogglePin(GPIOD, LD5_Pin);
+
+    ssd1963_init();
+  lv_disp_buf_init(&disp_buf, buf, buf2, LV_HOR_RES_MAX * 10);    //Initialize the display buffer
+  lv_init();
+  // LVGL Setup
+  lv_disp_drv_t disp_drv;               //Descriptor of a display driver
+  lv_disp_drv_init(&disp_drv);          //Basic initialization
+  // TFT
+  disp_drv.hor_res = 800;               //Set the horizontal resolution
+  disp_drv.ver_res = 480;               //Set the vertical resolution
+  disp_drv.flush_cb = ssd1963_flush;	//Set your driver function
+  disp_drv.buffer = &disp_buf;          //Assign the buffer to teh display
+  lv_disp_drv_register(&disp_drv);      //Finally register the drive
+  // Touch-Pad
+  /*Register a touchpad input device*/
+  lv_indev_drv_init(&indev_drv);
+  indev_drv.type = LV_INDEV_TYPE_POINTER;
+  indev_drv.read_cb = xpt2046_read;
+  indev_touchpad = lv_indev_drv_register(&indev_drv);
+
+  HAL_GPIO_TogglePin(GPIOD, LD6_Pin);
+  simulacare();
+
+  //lv_obj_t * scr = lv_disp_get_scr_act(NULL);     /*Get the current screen*/
+
+  /*Create a Label on the currently active screen*/
+  //lv_obj_t * label1 =  lv_label_create(scr, NULL);
+
+  /*Modify the Label's text*/
+  //lv_label_set_text(label1, "Hello world!");
+
+  /* Align the Label to the center
+   * NULL means align on parent (which is the screen now)
+   * 0, 0 at the end means an x, y offset after alignment*/
+  //lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
 
   /* USER CODE END 2 */
 
@@ -122,6 +165,10 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
+    // Eventos da GUI LittleVG
+  	  lv_task_handler();
+
+  	HAL_GPIO_TogglePin(GPIOD, LD4_Pin);
   }
   /* USER CODE END 3 */
 }
@@ -474,7 +521,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+  if (htim->Instance == TIM6) {
+	  lv_tick_inc(1);
+  }
   /* USER CODE END Callback 1 */
 }
 
