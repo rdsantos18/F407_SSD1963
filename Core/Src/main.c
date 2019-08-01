@@ -168,6 +168,8 @@ int main(void)
     // Eventos da GUI LittleVG
   	  lv_task_handler();
 
+  	  uint8_t spi_data = 0x55;
+  	HAL_SPI_Transmit(&hspi1, (uint8_t *)&spi_data, 1, HAL_MAX_DELAY);
   	HAL_GPIO_TogglePin(GPIOD, LD4_Pin);
   }
   /* USER CODE END 3 */
@@ -413,7 +415,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CS_I2C_SPI_GPIO_Port, CS_I2C_SPI_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(CS_I2C_SPI_GPIO_Port, CS_I2C_SPI_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, OTG_FS_PowerSwitchOn_Pin|T_CS_Pin, GPIO_PIN_SET);
